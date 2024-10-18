@@ -1,0 +1,454 @@
+CREATE TABLE "owner" (
+  "id" bigserial PRIMARY KEY,
+  "owner_did" varchar NOT NULL,
+  "owner_email" varchar,
+  "first_name" varchar,
+  "last_name" varchar,
+  "country" varchar,
+  "phone_number" bigint,
+  "country_code" varchar,
+  "description" varchar,
+  "company_name" varchar,
+  "company_regno" varchar,
+  "postal_code" bigint,
+  "city" varchar,
+  "state" varchar,
+  "address_line1" varchar,
+  "address_line2" varchar,
+  "profile_image" BYTEA,
+  "account_type" varchar  NOT NULL DEFAULT 'Pending',
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "wallet" (
+  "id" bigserial PRIMARY KEY,
+  "user_did" varchar NOT NULL,
+  "password" varchar NOT NULL,
+  "state_name" varchar NOT NULL,
+  "state_did" varchar NOT NULL,
+  "secret_key" varchar NOT NULL,
+  "seed_hash" varchar NOT NULL,
+  "state_isactive" boolean NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "file" (
+  "id" bigserial PRIMARY KEY,
+  "owner_id" varchar NOT NULL,
+  "file_hash" varchar NOT NULL,
+  "chunk_count" bigint NOT NULL,
+  "file_name" varchar NOT NULL,
+  "file_size" bigint NOT NULL,
+  "issued_claim" boolean DEFAULT false,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "download" (
+  "id" bigserial PRIMARY KEY,
+  "owner_id" varchar NOT NULL,
+  "file_hash" varchar UNIQUE NOT NULL,
+  "cid" varchar UNIQUE NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "file_share" (
+  "id" bigserial PRIMARY KEY,
+  "owner_id" varchar NOT NULL,
+  "share_did" varchar NOT NULL,
+  "file_hash" varchar NOT NULL,
+  "cid" varchar NOT NULL,
+  "response" jsonb NOT NULL,
+  "issue_state" boolean NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "share_file" (
+  "id" bigserial PRIMARY KEY,
+  "owner_id" varchar NOT NULL,
+  "share_did" varchar NOT NULL,
+  "file_hash" varchar NOT NULL,
+  "file_name" varchar NOT NULL,
+  "file_size" varchar NOT NULL,
+  "issue_claim" boolean DEFAULT false,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "share_claim_response" (
+  "id" bigserial PRIMARY KEY,
+  "owner_id" varchar NOT NULL,
+  "share_did" varchar NOT NULL,
+  "cid" varchar NOT NULL,
+  "file_hash" varchar NOT NULL,
+  "response" jsonb NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "biling_invoice" (
+  "id" bigserial PRIMARY KEY,
+  "owner_did" varchar NOT NULL,
+  "invoice_no" varchar NOT NULL,
+  "created_date" date NOT NULL,
+  "expire_date" date NOT NULL,
+  "amount" numeric NOT NULL,
+  "status" varchar NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "file_claim" (
+  "id" bigserial PRIMARY KEY,
+  "owner_id" varchar NOT NULL,
+  "file_hash" varchar NOT NULL,
+  "response" jsonb,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "batch_file" (
+  "id" bigserial PRIMARY KEY,
+  "owner_did" varchar NOT NULL,
+  "batch_hash" varchar NOT NULL,
+  "file_count" bigint NOT NULL,
+  "issue_claim" boolean DEFAULT false,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "batch_file_details" (
+  "id" bigserial PRIMARY KEY,
+  "owner_did" varchar NOT NULL,
+  "batch_id" varchar NOT NULL,
+  "file_name" varchar NOT NULL,
+  "file_hash" varchar NOT NULL,
+  "chunk_count" bigint NOT NULL,
+  "file_size" bigint NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "chunk" (
+  "id" bigserial PRIMARY KEY,
+  "file_hash" varchar NOT NULL,
+  "chunk_hash" varchar NOT NULL,
+  "chunk_index" bigint NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "user_tree" (
+  "id" bigserial PRIMARY KEY,
+  "user_tree" jsonb NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "user_onchain" (
+  "id" bigserial PRIMARY KEY,
+  "user_did" varchar NOT NULL,
+  "user_proof" jsonb NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "file_tree" (
+  "id" bigserial PRIMARY KEY,
+  "did" varchar NOT NULL,
+  "file_tree" jsonb NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "file_onchain" (
+  "id" bigserial PRIMARY KEY,
+  "did" varchar NOT NULL,
+  "file_proof" jsonb NOT NULL,
+  "file_hash" varchar NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "chunk_onchain" (
+  "id" bigserial PRIMARY KEY,
+  "chunk_hash" varchar NOT NULL,
+  "chunk_proof" jsonb NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "chunk_tree" (
+  "id" bigserial PRIMARY KEY,
+  "chunk_tree" jsonb NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "kyc" (
+  "id" bigserial PRIMARY KEY,
+  "rpc_id" varchar NOT NULL,
+  "owner_did" varchar NOT NULL,
+  "response" jsonb NOT NULL
+);
+
+CREATE TABLE "passport_kyc" (
+  "id" bigserial PRIMARY KEY,
+  "rpc_id" varchar NOT NULL,
+  "first_name" varchar NOT NULL,
+  "last_name" varchar NOT NULL,
+  "gender" varchar NOT NULL,
+  "date_of_birth" date NOT NULL,
+  "document_type" varchar NOT NULL,
+  "document_number" varchar NOT NULL,
+  "issue_country" varchar NOT NULL,
+  "date_of_issue" date NOT NULL,
+  "date_of_expiry" date NOT NULL,
+  "nationality_code" varchar NOT NULL,
+  "place_of_birth" varchar NOT NULL,
+  "mrz_full" varchar NOT NULL,
+  "optional_data" varchar NOT NULL,
+  "document_class_code" varchar NOT NULL,
+  "country" varchar NOT NULL,
+  "nationality" varchar NOT NULL,
+  "authority" varchar NOT NULL,
+  "surname_and_given_names" varchar NOT NULL,
+  "issuing_state_name" varchar NOT NULL,
+  "raw_date_of_birth" date NOT NULL
+);
+
+CREATE TABLE "driving_license" (
+  "id" bigserial PRIMARY KEY,
+  "rpc_id" varchar NOT NULL,
+  "date_of_birth" date NOT NULL,
+  "document_type" varchar NOT NULL,
+  "document_number" varchar NOT NULL,
+  "issue_country" varchar NOT NULL,
+  "date_of_issue" date NOT NULL,
+  "date_of_expiry" date NOT NULL,
+  "country" varchar NOT NULL,
+  "surname_and_given_names" varchar NOT NULL,
+  "issuing_state_name" varchar NOT NULL,
+  "reg_cert_reg_number" varchar NOT NULL
+);
+
+CREATE TABLE "id_card" (
+  "id" bigserial PRIMARY KEY,
+  "rpc_id" varchar NOT NULL,
+  "date_of_birth" date NOT NULL,
+  "document_type" varchar NOT NULL,
+  "document_number" varchar NOT NULL,
+  "issue_country" varchar NOT NULL,
+  "address" varchar NOT NULL,
+  "date_of_issue" date NOT NULL,
+  "nationality_code" varchar NOT NULL,
+  "country" varchar NOT NULL,
+  "original_address" varchar NOT NULL,
+  "issuing_state_name" varchar NOT NULL,
+  "booklet_number" varchar NOT NULL
+);
+
+CREATE TABLE "document_details" (
+  "id" bigserial PRIMARY KEY,
+  "rpc_id" varchar NOT NULL,
+  "doc_id" varchar NOT NULL,
+  "kind" varchar NOT NULL,
+  "media_type" varchar NOT NULL,
+  "uri" varchar NOT NULL
+);
+
+CREATE TABLE "overall_result" (
+  "id" bigserial PRIMARY KEY,
+  "rpc_id" varchar NOT NULL,
+  "liveness" varchar NOT NULL,
+  "face_matching" varchar NOT NULL,
+  "doc_check" varchar NOT NULL,
+  "overall_status" varchar NOT NULL
+);
+
+CREATE TABLE "contact_public" (
+  "id" bigserial PRIMARY KEY,
+  "email" varchar NOT NULL,
+  "subject" varchar NOT NULL,
+  "massage" varchar NOT NULL
+);
+
+CREATE TABLE "subscribe_waitlist" (
+  "id" bigserial PRIMARY KEY,
+  "email" varchar,
+  "status_waitlist" boolean DEFAULT false,
+  "status_subscribe" boolean DEFAULT false
+);
+
+CREATE TABLE "batch_claim" (
+  "id" bigserial PRIMARY KEY,
+  "batch_hash" varchar,
+  "claim" varchar,
+  "did" varchar
+);
+
+CREATE TABLE "file_cid" (
+  "id" bigserial PRIMARY KEY,
+  "batch_hash" varchar UNIQUE,
+  "file_hash" varchar UNIQUE,
+  "did" varchar,
+  "cid" jsonb
+);
+
+CREATE TABLE "share_claim" (
+  "id" bigserial PRIMARY KEY,
+  "batch_hash" varchar,
+  "file_hash" varchar,
+  "claim" varchar,
+  "did" varchar
+);
+
+CREATE TABLE "file_data" (
+  "id" bigserial PRIMARY KEY,
+  "did" varchar,
+  "batch_hash" varchar,
+  "file_hash" varchar,
+  "file_name" varchar
+);
+
+CREATE TABLE "merkle_tree" (
+  "id" bigserial PRIMARY KEY,
+  "merkle_tree" jsonb
+);
+
+CREATE TABLE "user_referral" (
+  "id" bigserial PRIMARY KEY,
+  "did" varchar,
+  "referral_id" varchar,
+  "package_count" bigint,
+  "referral_count" bigint,
+  "package_point" bigint,
+  "referral_point" bigint,
+  "file_point" bigint,
+  "total_point" bigint
+);
+
+CREATE TABLE "network_usage" (
+  "id" bigserial PRIMARY KEY,
+  "did" varchar NOT NULL,
+  "data_usage" bigint NOT NULL,
+  "timestamp" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE "coupon_create" (
+  "id" bigserial PRIMARY KEY,
+  "coupon_code" varchar NOT NULL,
+  "coupon_type" varchar NOT NULL,
+  "promotion" bigint NOT NULL,
+  "start_date" TIMESTAMP NOT NULL,
+  "valid_days" bigint NOT NULL,
+  "active" boolean NOT NULL
+);
+
+CREATE TABLE "user_coupon" (
+  "id" bigserial PRIMARY KEY,
+  "did" varchar NOT NULL,
+  "coupon_code" varchar NOT NULL
+);
+
+CREATE TABLE "user_oto" (
+  "id" bigserial PRIMARY KEY,
+  "did" varchar NOT NULL UNIQUE,
+  "otp" varchar NOT NULL UNIQUE,
+  "expires_at" TIMESTAMP NOT NULL,
+  "phone_number" varchar NOT NULL,
+  "verified" boolean DEFAULT false
+);
+
+
+CREATE TABLE "claim_mobile" (
+  "id" bigserial PRIMARY KEY,
+  "did" varchar NOT NULL,
+  "claim_response" jsonb
+);
+
+CREATE TABLE "verify_email" (
+  "id" bigserial PRIMARY KEY,
+  "did" varchar NOT NULL,
+  "user_email" varchar NOT NULL,
+  "token" varchar NOT NULL,
+  "is_verified" boolean DEFAULT false,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "becx_price" (
+  "id" bigserial PRIMARY KEY,
+  "becx_price" varchar NOT NULL,
+  "new_date" varchar NOT NULL
+);
+
+
+CREATE INDEX ON "owner" ("owner_did");
+
+CREATE INDEX ON "wallet" ("user_did");
+
+CREATE INDEX ON "file" ("owner_id");
+
+CREATE INDEX ON "download" ("owner_id");
+
+CREATE INDEX ON "file_share" ("owner_id");
+
+CREATE INDEX ON "share_file" ("owner_id");
+
+CREATE INDEX ON "share_claim_response" ("owner_id");
+
+CREATE INDEX ON "biling_invoice" ("owner_did");
+
+CREATE INDEX ON "file_claim" ("owner_id");
+
+CREATE INDEX ON "batch_file" ("owner_did");
+
+CREATE INDEX ON "batch_file_details" ("owner_did");
+
+CREATE INDEX ON "chunk" ("file_hash");
+
+CREATE INDEX ON "user_onchain" ("user_did");
+
+CREATE INDEX ON "file_tree" ("did");
+
+CREATE INDEX ON "file_onchain" ("did");
+
+CREATE INDEX ON "kyc" ("owner_did");
+
+CREATE INDEX ON "passport_kyc" ("rpc_id");
+
+CREATE INDEX ON "driving_license" ("rpc_id");
+
+CREATE INDEX ON "id_card" ("rpc_id");
+
+CREATE INDEX ON "document_details" ("rpc_id");
+
+CREATE INDEX ON "overall_result" ("rpc_id");
+
+ALTER TABLE "wallet" ADD FOREIGN KEY ("user_did") REFERENCES "owner" ("owner_did");
+
+ALTER TABLE "file" ADD FOREIGN KEY ("owner_id") REFERENCES "owner" ("owner_did");
+
+ALTER TABLE "download" ADD FOREIGN KEY ("owner_id") REFERENCES "owner" ("owner_did");
+
+ALTER TABLE "file_share" ADD FOREIGN KEY ("owner_id") REFERENCES "file" ("owner_id");
+
+ALTER TABLE "share_file" ADD FOREIGN KEY ("owner_id") REFERENCES "file" ("owner_id");
+
+ALTER TABLE "share_claim_response" ADD FOREIGN KEY ("owner_id") REFERENCES "share_file" ("owner_id");
+
+ALTER TABLE "biling_invoice" ADD FOREIGN KEY ("owner_did") REFERENCES "owner" ("owner_did");
+
+ALTER TABLE "file_claim" ADD FOREIGN KEY ("owner_id") REFERENCES "owner" ("owner_did");
+
+ALTER TABLE "file_claim" ADD FOREIGN KEY ("file_hash") REFERENCES "file" ("file_hash");
+
+ALTER TABLE "batch_file" ADD FOREIGN KEY ("owner_did") REFERENCES "owner" ("owner_did");
+
+ALTER TABLE "batch_file_details" ADD FOREIGN KEY ("owner_did") REFERENCES "owner" ("owner_did");
+
+ALTER TABLE "chunk" ADD FOREIGN KEY ("file_hash") REFERENCES "file" ("file_hash");
+
+ALTER TABLE "user_onchain" ADD FOREIGN KEY ("user_did") REFERENCES "owner" ("owner_did");
+
+ALTER TABLE "file_tree" ADD FOREIGN KEY ("did") REFERENCES "user_onchain" ("user_did");
+
+ALTER TABLE "file_onchain" ADD FOREIGN KEY ("did") REFERENCES "file_tree" ("did");
+
+ALTER TABLE "kyc" ADD FOREIGN KEY ("owner_did") REFERENCES "owner" ("owner_did");
+
+ALTER TABLE "passport_kyc" ADD FOREIGN KEY ("rpc_id") REFERENCES "kyc" ("rpc_id");
+
+ALTER TABLE "driving_license" ADD FOREIGN KEY ("rpc_id") REFERENCES "kyc" ("rpc_id");
+
+ALTER TABLE "id_card" ADD FOREIGN KEY ("rpc_id") REFERENCES "kyc" ("rpc_id");
+
+ALTER TABLE "document_details" ADD FOREIGN KEY ("rpc_id") REFERENCES "kyc" ("rpc_id");
+
+ALTER TABLE "overall_result" ADD FOREIGN KEY ("rpc_id") REFERENCES "kyc" ("rpc_id");
